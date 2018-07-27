@@ -2,6 +2,7 @@ import React, { PureComponent } from "react"
 import PropTypes from "prop-types"
 import { fromJS, List } from "immutable"
 import { getSampleSchema } from "core/utils"
+import Form from "react-jsonschema-form"
 
 const NOOP = Function.prototype
 
@@ -34,6 +35,7 @@ export default class ParamBody extends PureComponent {
       isEditBox: false,
       value: ""
     }
+    console.log(this.props.param.toObject().schema.toJSON());
 
   }
 
@@ -90,6 +92,13 @@ export default class ParamBody extends PureComponent {
 
   toggleIsEditBox = () => this.setState( state => ({isEditBox: !state.isEditBox}))
 
+  formOnChange = (value) => {
+    console.log(value)
+    let formValue = JSON.stringify(value.formData)
+    this.setState({ userDidModify: true })
+    this.setState({value: formValue})
+  }
+
   render() {
     let {
       onChangeConsumes,
@@ -113,11 +122,21 @@ export default class ParamBody extends PureComponent {
 
     let { value, isEditBox } = this.state
 
+
+
     return (
       <div className="body-param" data-param-name={param.get("name")} data-param-in={param.get("in")}>
         {
           isEditBox && isExecute
-            ? <TextArea className={ "body-param__text" + ( errors.count() ? " invalid" : "")} value={value} onChange={ this.handleOnChange }/>
+            ?
+            <div>
+              <TextArea className={ "body-param__text" + ( errors.count() ? " invalid" : "")} value={value} onChange={ this.handleOnChange }/>
+              <Form schema={this.props.param.toObject().schema.toJSON()}
+                    onChange={this.formOnChange}
+                    formData={JSON.parse(value)} >
+                    <button type="submit" style={{visibility: "hidden"}}></button>
+              </Form>
+            </div>
             : (value && <HighlightCode className="body-param__example"
                                value={ value }/>)
         }

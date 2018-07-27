@@ -2,6 +2,7 @@ import React, { PureComponent } from "react"
 import PropTypes from "prop-types"
 import { fromJS } from "immutable"
 import { getSampleSchema, stringify } from "core/utils"
+import Form from "react-jsonschema-form"
 
 const NOOP = Function.prototype
 
@@ -30,6 +31,8 @@ export default class RequestBodyEditor extends PureComponent {
       userDidModify: false,
       value: ""
     }
+
+    console.log(this.props.requestBody.toJS().content["application/json"]["schema"]);
   }
 
   componentDidMount() {
@@ -77,6 +80,7 @@ export default class RequestBodyEditor extends PureComponent {
   }
 
   onChange = (value) => {
+    console.log("change1")
     this.setState({value})
     this.props.onChange(value)
   }
@@ -88,6 +92,15 @@ export default class RequestBodyEditor extends PureComponent {
 
     this.setState({ userDidModify: true })
     this.onChange(inputValue)
+    console.log("change2")
+  }
+
+  formOnChange = (value) => {
+    console.log(value)
+    let formValue = JSON.stringify(value.formData)
+    this.setState({ userDidModify: true })
+    this.setState({value: formValue})
+    this.props.onChange(formValue)
   }
 
   toggleIsEditBox = () => this.setState( state => ({isEditBox: !state.isEditBox}))
@@ -109,7 +122,15 @@ export default class RequestBodyEditor extends PureComponent {
       <div className="body-param">
         {
           isEditBox && isExecute
-            ? <TextArea className={"body-param__text"} value={value} onChange={ this.handleOnChange }/>
+            ?
+
+            <div>
+              <TextArea className={"body-param__text"} value={value} onChange={ this.handleOnChange } />
+              <Form schema={this.props.requestBody.toJS()["content"]["application/json"]["schema"]} onChange={this.formOnChange} formData={JSON.parse(value)}>
+                  <button type="submit" style={{visibility: "hidden"}}></button>
+              </Form>
+            </div>
+
             : (value && <HighlightCode className="body-param__example"
                                value={ value }/>)
         }

@@ -121,6 +121,7 @@
     "open": "0.0.5",
     "postcss-loader": "^2.1.5",
     "raw-loader": "0.5.1",
+    "react-jsonschema-form": "^1.0.4",
     "react-test-renderer": "^15.5.4",
     "rimraf": "^2.6.0",
     "sass-loader": "^7.0.1",
